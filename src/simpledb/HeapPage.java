@@ -289,7 +289,8 @@ public class HeapPage implements Page {
 	}
 
 	/**
-	 * Returns the number of empty slots on this page.
+	 * Returns the number of empty slots on this page. may need to change,
+	 * now O(n)
 	 */
 	public int getNumEmptySlots() {
 		int numEmptySlots = 0;
