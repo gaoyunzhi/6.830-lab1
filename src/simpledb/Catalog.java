@@ -15,11 +15,15 @@ import java.util.*;
 
 public class Catalog {
 
+	private HashMap<String, DbFile> _fileMap = new HashMap<String, DbFile>();
+	private HashMap<String, String> _pkeyMap = new HashMap<String, String>();
+	private HashMap<Integer, String> _nameMap = new HashMap<Integer, String>();
+
 	/**
 	 * Constructor. Creates a new, empty catalog.
 	 */
 	public Catalog() {
-		// some code goes here
+
 	}
 
 	/**
@@ -38,7 +42,9 @@ public class Catalog {
 	 *            last table to be added as the table for a given name.
 	 */
 	public void addTable(DbFile file, String name, String pkeyField) {
-		// some code goes here
+		_fileMap.put(name, file);
+		_pkeyMap.put(name, pkeyField);
+		_nameMap.put(file.getId(), name);
 	}
 
 	public void addTable(DbFile file, String name) {
@@ -68,8 +74,11 @@ public class Catalog {
 	 *             if the table doesn't exist
 	 */
 	public int getTableId(String name) {
-		// some code goes here
-		return 0;
+		final DbFile f = _fileMap.get(name);
+		if (f == null) {
+			throw new NoSuchElementException("No table: " + name + "exists");
+		}
+		return f.getId();
 	}
 
 	/**
@@ -80,8 +89,12 @@ public class Catalog {
 	 *            function passed to addTable
 	 */
 	public TupleDesc getTupleDesc(int tableid) throws NoSuchElementException {
-		// some code goes here
-		return null;
+		final String name = _nameMap.get(tableid);
+		if (name == null) {
+			throw new NoSuchElementException("No table id: " + tableid
+			        + "exists");
+		}
+		return _fileMap.get(name).getTupleDesc();
 	}
 
 	/**
@@ -93,28 +106,32 @@ public class Catalog {
 	 *            function passed to addTable
 	 */
 	public DbFile getDbFile(int tableid) throws NoSuchElementException {
-		// some code goes here
-		return null;
+		final String name = _nameMap.get(tableid);
+		if (name == null) {
+			throw new NoSuchElementException("No table id: " + tableid
+			        + "exists");
+		}
+		return _fileMap.get(name);
 	}
 
 	/** Delete all tables from the catalog */
 	public void clear() {
-		// some code goes here
+		_fileMap.clear();
+		_pkeyMap.clear();
+		_nameMap.clear();
 	}
 
 	public String getPrimaryKey(int tableid) {
-		// some code goes here
-		return null;
+		final String name = _nameMap.get(tableid);
+		return _pkeyMap.get(name);
 	}
 
 	public Iterator<Integer> tableIdIterator() {
-		// some code goes here
-		return null;
+		return _nameMap.keySet().iterator();
 	}
 
 	public String getTableName(int id) {
-		// some code goes here
-		return null;
+		return _nameMap.get(id);
 	}
 
 	/**
@@ -167,7 +184,9 @@ public class Catalog {
 				addTable(tabHf, name, primaryKey);
 				System.out.println("Added table : " + name + " with schema "
 				        + t);
+
 			}
+			br.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.exit(0);
