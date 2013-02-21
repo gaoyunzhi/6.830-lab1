@@ -7,6 +7,7 @@ package simpledb;
  */
 public class Tuple {
 	private final TupleDesc _tupleDesc;
+	private final int _numFields;
 	private RecordId _recordId;
 	private Field[] _fields;
 
@@ -19,6 +20,8 @@ public class Tuple {
 	 */
 	public Tuple(TupleDesc td) {
 		_tupleDesc = td;
+		_numFields=td.numFields();
+		_fields = new Field[_numFields];
 	}
 
 	/**
@@ -33,8 +36,7 @@ public class Tuple {
 	 *         be null.
 	 */
 	public RecordId getRecordId() {
-		// some code goes here
-		return null;
+		return _recordId;
 	}
 
 	/**
@@ -44,7 +46,7 @@ public class Tuple {
 	 *            the new RecordId for this tuple.
 	 */
 	public void setRecordId(RecordId rid) {
-		// some code goes here
+		_recordId=rid;
 	}
 
 	/**
@@ -56,7 +58,7 @@ public class Tuple {
 	 *            new value for the field.
 	 */
 	public void setField(int i, Field f) {
-		// some code goes here
+		_fields[i]=f;
 	}
 
 	/**
@@ -66,8 +68,7 @@ public class Tuple {
 	 *            field index to return. Must be a valid index.
 	 */
 	public Field getField(int i) {
-		// some code goes here
-		return null;
+		return _fields[i];
 	}
 
 	/**
@@ -79,7 +80,20 @@ public class Tuple {
 	 * where \t is any whitespace, except newline, and \n is a newline
 	 */
 	public String toString() {
-		// some code goes here
-		throw new UnsupportedOperationException("Implement this");
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < _numFields; i++) {
+			String col = "null";
+			if (_fields[i] != null) {
+				col = _fields[i].toString();
+			}
+			sb.append(col);
+			if (i != _numFields - 1) {
+				sb.append("\t");
+			}else{
+				sb.append("\n");
+			}
+		}
+
+		return sb.toString();
 	}
 }
