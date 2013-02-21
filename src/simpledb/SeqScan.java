@@ -9,6 +9,12 @@ import java.util.*;
  */
 public class SeqScan implements DbIterator {
 
+	final private String _tableAlias;
+	final private int _tableid;
+	final private TransactionId _tid;
+	final private DbFileIterator _iterator;
+	final private DbFile _file;
+
 	/**
 	 * Creates a sequential scan over the specified table as a part of the
 	 * specified transaction.
@@ -26,11 +32,15 @@ public class SeqScan implements DbIterator {
 	 *            tableAlias.null, or null.null).
 	 */
 	public SeqScan(TransactionId tid, int tableid, String tableAlias) {
-		// some code goes here
+		_tid=tid;
+		_tableid=tableid;
+		_tableAlias=tableAlias;
+		_file=Database.getCatalog().getDbFile(_tableid);
+		_iterator = new HeapFileIterator(_tid, (HeapFile) _file);
 	}
 
 	public void open() throws DbException, TransactionAbortedException {
-		// some code goes here
+		_iterator.open();
 	}
 
 	/**
@@ -41,27 +51,32 @@ public class SeqScan implements DbIterator {
 	 *         prefixed with the tableAlias string from the constructor.
 	 */
 	public TupleDesc getTupleDesc() {
-		// some code goes here
-		return null;
+		TupleDesc origin=_file.getTupleDesc();
+		int length = origin.numFields();        
+        Type[] types = new Type[length];
+        String[] names = new String[length];
+        for (int i = 0; i < length; i++) {
+            types[i] = origin.getType(i);
+            names[i] = _tableAlias + "." + origin.getFieldName(i);
+        }
+        return new TupleDesc(types, names);
 	}
 
 	public boolean hasNext() throws TransactionAbortedException, DbException {
-		// some code goes here
-		return false;
+		return _iterator.hasNext();
 	}
 
 	public Tuple next() throws NoSuchElementException,
 	        TransactionAbortedException, DbException {
-		// some code goes here
-		return null;
+		return _iterator.next();
 	}
 
 	public void close() {
-		// some code goes here
+		_iterator.close();
 	}
 
 	public void rewind() throws DbException, NoSuchElementException,
 	        TransactionAbortedException {
-		// some code goes here
+		_iterator.rewind();
 	}
 }
