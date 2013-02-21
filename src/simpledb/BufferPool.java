@@ -1,6 +1,8 @@
 package simpledb;
 
 import java.io.*;
+import java.util.HashMap;
+import java.util.NoSuchElementException;
 /**
  * BufferPool manages the reading and writing of pages into memory from
  * disk. Access methods call into it to retrieve pages, and it fetches
@@ -18,6 +20,9 @@ public class BufferPool {
     other classes. BufferPool should use the numPages argument to the
     constructor instead. */
     public static final int DEFAULT_PAGES = 50;
+    private int _numPages=0;
+    private final int _maxNumPages;
+    private final HashMap<PageId,Page> _cache=new HashMap<PageId,Page>();
 
     /**
      * Creates a BufferPool that caches up to numPages pages.
@@ -25,7 +30,8 @@ public class BufferPool {
      * @param numPages maximum number of pages in this buffer pool.
      */
     public BufferPool(int numPages) {
-        // some code goes here
+    	_maxNumPages=numPages;
+    	
     }
 
     /**
@@ -45,8 +51,22 @@ public class BufferPool {
      */
     public  Page getPage(TransactionId tid, PageId pid, Permissions perm)
         throws TransactionAbortedException, DbException {
-        // some code goes here
-        return null;
+    		if (_cache.containsKey(pid)){return _cache.get(pid);}
+    		if (_numPages==_maxNumPages){throw new TransactionAbortedException(); }
+    		DbFile f =null;
+    		try{
+    			f = Database.getCatalog().getDbFile(pid.getTableId());
+    		}catch (NoSuchElementException e){
+    			throw new DbException(e.getMessage());
+    		}
+    		Page p=null;
+    		try{
+    			p = f.readPage(pid);
+    		}catch (Exception e){
+    			throw new TransactionAbortedException();
+    		}
+    		_cache.put(pid,p);
+    		return p;
     }
 
     /**
