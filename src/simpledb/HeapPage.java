@@ -50,12 +50,13 @@ public class HeapPage implements Page {
 		header = new byte[getHeaderSize()];
 		for (int i = 0; i < header.length; i++)
 			header[i] = dis.readByte();
-
 		try {
 			// allocate and read the actual records of this page
 			tuples = new Tuple[numSlots];
-			for (int i = 0; i < tuples.length; i++)
+			for (int i = 0; i < tuples.length; i++) {
 				tuples[i] = readNextTuple(dis, i);
+			}
+
 		} catch (NoSuchElementException e) {
 			e.printStackTrace();
 		}
@@ -291,22 +292,25 @@ public class HeapPage implements Page {
 	 * Returns the number of empty slots on this page.
 	 */
 	public int getNumEmptySlots() {
-		int  numEmptySlots=0;
-        for (int i = 0; i < tuples.length; i++) {
-                if (! getSlot(i)) {
-                        numEmptySlots+=1;
-                }
-        }
-        return numEmptySlots;
+		int numEmptySlots = 0;
+		for (int i = 0; i < tuples.length; i++) {
+			if (!getSlot(i)) {
+				numEmptySlots += 1;
+			}
+		}
+		return numEmptySlots;
 	}
 
 	/**
 	 * Returns true if associated slot on this page is filled.
 	 */
 	public boolean getSlot(int i) {
-		// some code goes here
-		return tuples[i]!=null;
+		int headerInt = (int) Math.floor(i / 8); // bype=8 bit
+		int intOffset = i % 8;
+		int associateByte=this.header[headerInt];
+		return (associateByte>>>intOffset)!=0;
 	}
+
 
 	/**
 	 * Abstraction to fill or clear a slot on this page.
@@ -321,15 +325,15 @@ public class HeapPage implements Page {
 	 *         iterator throws an UnsupportedOperationException) (note that this
 	 *         iterator shouldn't return tuples in empty slots!)
 	 */
-	//may need a new copy of iterator
+	// may need a new copy of iterator
 	public Iterator<Tuple> iterator() {
-        List<Tuple> filledSlots = new ArrayList<Tuple>();
-        for (int i = 0; i < tuples.length; i++) {
-                if (getSlot(i)) {
-                        filledSlots.add(tuples[i]);
-                }
-        }
-        return new ArrayList<Tuple>(filledSlots).iterator();
+		List<Tuple> filledSlots = new ArrayList<Tuple>();
+		for (int i = 0; i < tuples.length; i++) {
+			if (getSlot(i)) {
+				filledSlots.add(tuples[i]);
+			}
+		}
+		return new ArrayList<Tuple>(filledSlots).iterator();
 	}
 
 }
