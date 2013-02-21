@@ -127,7 +127,7 @@ public class Catalog {
 	}
 
 	public Iterator<Integer> tableIdIterator() {
-		return _nameMap.keySet().iterator();
+		return new HashSet<Integer>(_nameMap.keySet()).iterator();
 	}
 
 	public String getTableName(int id) {

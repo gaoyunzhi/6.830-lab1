@@ -70,8 +70,9 @@ public class HeapPage implements Page {
 	 * @return the number of tuples on this page
 	 */
 	private int getNumTuples() {
-		// some code goes here
-		return 0;
+		int tupleSize = td.getSize();
+		return (int) Math
+		        .floor(((BufferPool.PAGE_SIZE * 8.0) / (tupleSize * 8.0 + 1.0)));
 
 	}
 
@@ -83,10 +84,7 @@ public class HeapPage implements Page {
 	 *         each tuple occupying tupleSize bytes
 	 */
 	private int getHeaderSize() {
-
-		// some code goes here
-		return 0;
-
+		return (int) Math.ceil(numSlots / 8.0);
 	}
 
 	/**
@@ -111,8 +109,7 @@ public class HeapPage implements Page {
 	 * @return the PageId associated with this page.
 	 */
 	public HeapPageId getId() {
-		// some code goes here
-		throw new UnsupportedOperationException("implement this");
+		return pid;
 	}
 
 	/**
@@ -208,8 +205,8 @@ public class HeapPage implements Page {
 		// padding
 		int zerolen = BufferPool.PAGE_SIZE
 		        - (header.length + td.getSize() * tuples.length); // - numSlots
-																  // *
-																  // td.getSize();
+		                                                          // *
+		                                                          // td.getSize();
 		byte[] zeroes = new byte[zerolen];
 		try {
 			dos.write(zeroes, 0, zerolen);
@@ -294,8 +291,13 @@ public class HeapPage implements Page {
 	 * Returns the number of empty slots on this page.
 	 */
 	public int getNumEmptySlots() {
-		// some code goes here
-		return 0;
+		int  numEmptySlots=0;
+        for (int i = 0; i < tuples.length; i++) {
+                if (! getSlot(i)) {
+                        numEmptySlots+=1;
+                }
+        }
+        return numEmptySlots;
 	}
 
 	/**
@@ -303,7 +305,7 @@ public class HeapPage implements Page {
 	 */
 	public boolean getSlot(int i) {
 		// some code goes here
-		return false;
+		return tuples[i]!=null;
 	}
 
 	/**
@@ -319,9 +321,15 @@ public class HeapPage implements Page {
 	 *         iterator throws an UnsupportedOperationException) (note that this
 	 *         iterator shouldn't return tuples in empty slots!)
 	 */
+	//may need a new copy of iterator
 	public Iterator<Tuple> iterator() {
-		// some code goes here
-		return null;
+        List<Tuple> filledSlots = new ArrayList<Tuple>();
+        for (int i = 0; i < tuples.length; i++) {
+                if (getSlot(i)) {
+                        filledSlots.add(tuples[i]);
+                }
+        }
+        return new ArrayList<Tuple>(filledSlots).iterator();
 	}
 
 }
