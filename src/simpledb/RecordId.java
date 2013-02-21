@@ -5,51 +5,65 @@ package simpledb;
  * specific table.
  */
 public class RecordId {
+	
+	private final PageId _pid;
+	private final int _tupleno;
 
     /** Creates a new RecordId refering to the specified PageId and tuple number.
      * @param pid the pageid of the page on which the tuple resides
      * @param tupleno the tuple number within the page.
      */
     public RecordId(PageId pid, int tupleno) {
-        // some code goes here
+        _pid=pid;
+        _tupleno=tupleno;
     }
 
     /**
      * @return the tuple number this RecordId references.
      */
     public int tupleno() {
-        // some code goes here
-        return 0;
+        return _tupleno;
     }
 
     /**
      * @return the page id this RecordId references.
      */
     public PageId getPageId() {
-        // some code goes here
-        return null;
+        return _pid;
     }
     
-    /**
-     * Two RecordId objects are considered equal if they represent the same tuple.
-     * @return True if this and o represent the same tuple
-     */
+    /* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
     @Override
-    public boolean equals(Object o) {
-    	// some code goes here
-    	throw new UnsupportedOperationException("implement this");
+    public boolean equals(Object obj) {
+	    if (this == obj)
+		    return true;
+	    if (obj == null)
+		    return false;
+	    if (getClass() != obj.getClass())
+		    return false;
+	    RecordId other = (RecordId) obj;
+	    if (_pid == null) {
+		    if (other._pid != null)
+			    return false;
+	    } else if (!_pid.equals(other._pid))
+		    return false;
+	    if (_tupleno != other._tupleno)
+		    return false;
+	    return true;
     }
     
-    /**
-     * You should implement the hashCode() so that two equal RecordId instances
-     * (with respect to equals()) have the same hashCode().
-     * @return An int that is the same for equal RecordId objects.
-     */
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
     @Override
     public int hashCode() {
-    	// some code goes here
-    	throw new UnsupportedOperationException("implement this");
-    	
+	    final int prime = 31;
+	    int result = 1;
+	    result = prime * result + ((_pid == null) ? 0 : _pid.hashCode());
+	    result = prime * result + _tupleno;
+	    return result;
     }
     
 }
