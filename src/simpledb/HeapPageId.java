@@ -2,6 +2,9 @@ package simpledb;
 
 /** Unique identifier for HeapPage objects. */
 public class HeapPageId implements PageId {
+	
+	private final int _tableId;
+	private final int _pgNo;
 
     /**
      * Constructor. Create a page id structure for a specific page of a
@@ -11,13 +14,13 @@ public class HeapPageId implements PageId {
      * @param pgNo The page number in that table.
      */
     public HeapPageId(int tableId, int pgNo) {
-        // some code goes here
+        _tableId=tableId;
+        _pgNo=pgNo;
     }
 
     /** @return the table associated with this PageId */
     public int getTableId() {
-        // some code goes here
-        return 0;
+        return _tableId;
     }
 
     /**
@@ -25,31 +28,38 @@ public class HeapPageId implements PageId {
      *   this PageId
      */
     public int pageno() {
-        // some code goes here
-        return 0;
+        return _pgNo;
     }
 
-    /**
-     * @return a hash code for this page, represented by the concatenation of
-     *   the table number and the page number (needed if a PageId is used as a
-     *   key in a hash table in the BufferPool, for example.)
-     * @see BufferPool
-     */
+    /* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+    @Override
     public int hashCode() {
-        // some code goes here
-        throw new UnsupportedOperationException("implement this");
+	    final int prime = 31;
+	    int result = 1;
+	    result = prime * result + _pgNo;
+	    result = prime * result + _tableId;
+	    return result;
     }
 
-    /**
-     * Compares one PageId to another.
-     *
-     * @param o The object to compare against (must be a PageId)
-     * @return true if the objects are equal (e.g., page numbers and table
-     *   ids are the same)
-     */
-    public boolean equals(Object o) {
-        // some code goes here
-        return false;
+    /* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+    @Override
+    public boolean equals(Object obj) {
+	    if (this == obj)
+		    return true;
+	    if (obj == null)
+		    return false;
+	    if (getClass() != obj.getClass())
+		    return false;
+	    HeapPageId other = (HeapPageId) obj;
+	    if (_pgNo != other._pgNo)
+		    return false;
+	    if (_tableId != other._tableId)
+		    return false;
+	    return true;
     }
 
     /**
